@@ -1,0 +1,43 @@
+name: Build HiddenRealmCommander
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          unzip -q HiddenRealmCommander-FIXED-SOURCE.zip
+          ls -la hidden-realm-commander
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Compile plugin
+        working-directory: hidden-realm-commander
+        run: gradle build
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: HiddenRealmCommander
+          path: hidden-realm-commander/build/libs/HiddenRealmCommander.jar
+          if-no-files-found: error
+          
